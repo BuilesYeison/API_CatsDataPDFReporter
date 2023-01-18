@@ -27,7 +27,20 @@ public class CatDAO{
         List<CatBreedDTO> catBreeds = await dataAccess.GetData<CatBreedDTO>("https://catfact.ninja/breeds");
         
         if(!String.IsNullOrEmpty(filterByBreedOrigin))
-            catBreeds.Where(x=>x.Origin.ToLower() == filterByBreedOrigin.ToLower());
+            return catBreeds.Where(x=>x.Origin.ToLower().Contains(filterByBreedOrigin.ToLower())).ToList();
+        
         return catBreeds;
+    }
+
+    /// <summary>
+    /// Get facts about cats from external api
+    /// </summary>
+    /// <param name="limit">number of facts to return</param>
+    /// <returns>List<CatFactDTO></returns>
+    public async Task<List<CatFactDTO>> GetCatFacts(int? limit =null){
+        List<CatFactDTO> result =new List<CatFactDTO>();
+        string url = String.Format("https://catfact.ninja/facts{0}",limit!=null? $"?limit={limit}":string.Empty);
+        result = await dataAccess.GetData<CatFactDTO>(url);
+        return result;
     }
 }
