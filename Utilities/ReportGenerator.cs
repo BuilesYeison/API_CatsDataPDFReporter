@@ -6,6 +6,9 @@ using PdfReporter.Interfaces;
 
 namespace PdfReporter.Utilities;
 
+/// <summary>
+/// Allows to convert html content to pdf reports
+/// </summary>
 public class ReportGenerator : IReportGenerator
 {
     /// <summary>
@@ -54,7 +57,7 @@ public class ReportGenerator : IReportGenerator
                 htmlContent = htmlContent.Replace(variableToPutRows, tableHtmlRow);
             }
             htmlContent = htmlContent.Replace(variableToPutRows, string.Empty);
-            GeneratePdf(reportPath, htmlContent);
+            GeneratePdf(reportPath, htmlContent,Path.Combine(rootPath, "Utilities/HtmlBases/header.html"));
         }
         catch (Exception ex)
         {

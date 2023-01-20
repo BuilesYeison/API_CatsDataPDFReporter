@@ -2,6 +2,9 @@ using PdfReporter.DataTransferObjects;
 
 namespace PdfReporter.Interfaces;
 
+/// <summary>
+/// Allows to convert html content to pdf reports
+/// </summary>
 public interface IReportGenerator
 {
     /// <summary>
