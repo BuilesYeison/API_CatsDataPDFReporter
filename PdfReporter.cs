@@ -2,8 +2,6 @@ using PdfReporter.Repositories;
 using PdfReporter.Interfaces;
 using PdfReporter.DataAccesObjects;
 using DinkToPdf;
-using DinkToPdf.Contracts;
-using System.Net;
 using PdfReporter.Utilities;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,12 +27,20 @@ app.MapGet("/cat-breeds/{origin}", async (string origin,ICatDAO catDb, IReportGe
     return string.IsNullOrEmpty(url)? Results.BadRequest("Error al crear reporte pdf") : Results.Ok(url);
 });
 
-app.MapGet("/cat-facts", async (ICatDAO catDb, IReportGenerator reportGenerator) => {    
-    return await catDb.GetCatFacts();
+app.MapGet("/cat-facts", async (ICatDAO catDb, IReportGenerator reportGenerator) => {
+    var catFactsData = await catDb.GetCatFacts();
+    if(catFactsData == null || catFactsData.Count() == 0)
+        throw new InvalidOperationException("No fue posible la consulta de información");
+    string url = reportGenerator.GetCatFactsReport(catFactsData);
+    return string.IsNullOrEmpty(url)? Results.BadRequest("Error al crear reporte pdf") : Results.Ok(url);
 });
 
 app.MapGet("/cat-facts/{limit}", async (int limit,ICatDAO catDb, IReportGenerator reportGenerator) => {    
-    return await catDb.GetCatFacts(limit);
+    var catFactsData = await catDb.GetCatFacts(limit);
+    if(catFactsData == null || catFactsData.Count() == 0)
+        throw new InvalidOperationException("No fue posible la consulta de información");
+    string url = reportGenerator.GetCatFactsReport(catFactsData);
+    return string.IsNullOrEmpty(url)? Results.BadRequest("Error al crear reporte pdf") : Results.Ok(url);
 });
 
 app.Run();

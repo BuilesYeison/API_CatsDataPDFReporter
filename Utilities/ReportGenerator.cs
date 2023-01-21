@@ -68,6 +68,43 @@ public class ReportGenerator : IReportGenerator
     }
 
     /// <summary>
+    /// Allows to receive cat facts information and converting it in a pdf report from html document
+    /// </summary>
+    /// <param name="catFactsData">cat facts information</param>
+    /// <returns>Url that allows to download the pdf report</returns>
+    public string GetCatFactsReport(List<CatFactDTO> catFactsData)
+    {
+        string reportPath = Path.Combine(rootPath, $"Utilities/Reports/CatFactsReport{DateTime.Now.ToString("yyyyMMddhhmmss")}.pdf");
+        try
+        {
+            var htmlContent = string.Empty;
+            using (WebClient wbc = new WebClient())
+            {
+                htmlContent = wbc.DownloadString(Path.Combine(rootPath, "Utilities/HtmlBases/cat-facts-report.html"));
+            }
+
+            string variableToPutRows = "*pRows";//in html document
+            foreach (var catFact in catFactsData)
+            {
+
+                string tableHtmlRow = $"<tr>" +
+                $"<td>{catFact.Fact}</td>" +
+                $"</tr>\n" +
+                $"{variableToPutRows}";
+                htmlContent = htmlContent.Replace(variableToPutRows, tableHtmlRow);
+            }
+            htmlContent = htmlContent.Replace(variableToPutRows, string.Empty);
+            GeneratePdf(reportPath, htmlContent,Path.Combine(rootPath, "Utilities/HtmlBases/header.html"));
+        }
+        catch (Exception ex)
+        {
+            return String.Empty;
+        }
+
+        return reportPath;
+    }
+
+    /// <summary>
     /// Create a pdf document from a html content
     /// </summary>
     /// <param name="reportPath">Where pdf will be saved</param>
