@@ -31,17 +31,17 @@ public class ReportGenerator : IReportGenerator
     /// </summary>
     /// <param name="catBreedData">cat breeds information</param>
     /// <returns>Url that allows to download the pdf report</returns>
-    public string GetCatBreedReport(List<CatBreedDTO> catBreedData)
-    {
-        string reportPath = Path.Combine(rootPath, $"Utilities/Reports/CatBreedReport{DateTime.Now.ToString("yyyyMMddhhmmss")}.pdf");
+    public IResponse GetCatBreedReport(List<CatBreedDTO> catBreedData)
+    {        
         try
         {
+            string reportPath = Path.Combine(rootPath, $"Utilities/Reports/CatBreedReport{DateTime.Now.ToString("yyyyMMddhhmmss")}.pdf");
             var htmlContent = string.Empty;
             using (WebClient wbc = new WebClient())
             {
                 htmlContent = wbc.DownloadString(Path.Combine(rootPath, "Utilities/HtmlBases/cat-breed-report.html"));
             }
-
+            
             string variableToPutRows = "*pRows";//in html document
             foreach (var catBreed in catBreedData)
             {
@@ -58,13 +58,15 @@ public class ReportGenerator : IReportGenerator
             }
             htmlContent = htmlContent.Replace(variableToPutRows, string.Empty);
             GeneratePdf(reportPath, htmlContent,Path.Combine(rootPath, "Utilities/HtmlBases/header.html"));
+            return new SuccessResponseDTO{
+                Url=reportPath,
+                Details =""
+            };
         }
-        catch (Exception ex)
+        catch
         {
-            return String.Empty;
-        }
-
-        return reportPath;
+            throw;
+        }        
     }
 
     /// <summary>
@@ -72,16 +74,19 @@ public class ReportGenerator : IReportGenerator
     /// </summary>
     /// <param name="catFactsData">cat facts information</param>
     /// <returns>Url that allows to download the pdf report</returns>
-    public string GetCatFactsReport(List<CatFactDTO> catFactsData)
-    {
-        string reportPath = Path.Combine(rootPath, $"Utilities/Reports/CatFactsReport{DateTime.Now.ToString("yyyyMMddhhmmss")}.pdf");
+    public IResponse GetCatFactsReport(List<CatFactDTO> catFactsData)
+    {        
         try
         {
+            string reportPath = Path.Combine(rootPath, $"Utilities/Reports/CatFactsReport{DateTime.Now.ToString("yyyyMMddhhmmss")}.pdf");
             var htmlContent = string.Empty;
             using (WebClient wbc = new WebClient())
             {
                 htmlContent = wbc.DownloadString(Path.Combine(rootPath, "Utilities/HtmlBases/cat-facts-report.html"));
             }
+
+            if(string.IsNullOrEmpty(htmlContent))
+                throw new FileLoadException("El contenido html para la generación del pdf no ha sido obtenido correctamente");
 
             string variableToPutRows = "*pRows";//in html document
             foreach (var catFact in catFactsData)
@@ -95,13 +100,15 @@ public class ReportGenerator : IReportGenerator
             }
             htmlContent = htmlContent.Replace(variableToPutRows, string.Empty);
             GeneratePdf(reportPath, htmlContent,Path.Combine(rootPath, "Utilities/HtmlBases/header.html"));
+            return new SuccessResponseDTO{
+                Url=reportPath,
+                Details =""
+            };
         }
-        catch (Exception ex)
+        catch
         {
-            return String.Empty;
-        }
-
-        return reportPath;
+            throw;
+        }        
     }
 
     /// <summary>
